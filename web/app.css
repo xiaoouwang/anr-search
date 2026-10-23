@@ -33,27 +33,37 @@ html, body {
 }
 
 .credits {
-  margin-top: 36px;
-  padding: 22px 8px 0;
-  border-top: 1px solid var(--line);
+  margin: 0 0 18px;
+  padding: 12px 14px;
+  max-width: 46rem;
   color: var(--muted);
   font-size: 0.88rem;
   line-height: 1.5;
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid var(--line);
+  border-radius: 10px;
 }
 
 .credits p {
-  margin: 0 0 8px;
-  max-width: 46rem;
+  margin: 0 0 6px;
 }
 
-.credits strong {
-  color: var(--ink);
-  font-weight: 600;
+.credits p:last-child {
+  margin-bottom: 0;
 }
 
 .credits a {
   color: var(--sea-deep);
   text-underline-offset: 2px;
+}
+
+.credits .credit-name {
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.credits .credit-role {
+  font-weight: 600;
 }
 
 .hero { padding: 18px 8px 22px; }
