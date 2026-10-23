@@ -40,6 +40,7 @@
   const els = {
     q: $("q"),
     coordOnly: $("coord-only"),
+    newOnly: $("new-only"),
     sort: $("sort"),
     reset: $("reset"),
     exportBtn: $("export"),
@@ -84,6 +85,8 @@
     ville: r.v,
     region: r.r,
     aide_partenaire: r.h,
+    firstSeen: r.fs || null,
+    isNew: !!r.n,
   });
 
   const projectKey = (raw) => `${raw.s || "DGDS"}|${raw.c || ""}`;
@@ -247,6 +250,11 @@
         `<span class="chip">Coordinateur <button type="button" data-remove-coord="1">×</button></span>`
       );
     }
+    if (els.newOnly?.checked) {
+      chips.push(
+        `<span class="chip">Nouveaux <button type="button" data-remove-new="1">×</button></span>`
+      );
+    }
     els.activeChips.hidden = chips.length === 0;
     els.activeChips.innerHTML = chips.join("");
   }
@@ -270,6 +278,7 @@
     if (selected.programmes.size && !selected.programmes.has(row.programme || "")) return false;
     if (selected.villes.size && !selected.villes.has(row.ville || "")) return false;
     if (els.coordOnly.checked && !row.coordinateur) return false;
+    if (els.newOnly?.checked && !row.isNew) return false;
     if (tokens.length) {
       const hay = norm(
         [
@@ -319,6 +328,7 @@
       selected.programmes.size ||
       selected.villes.size ||
       els.coordOnly.checked ||
+      els.newOnly?.checked ||
       norm(els.q.value.trim());
 
     // Show post-filter once the primary result set is manageable, or any primary filter is on
@@ -476,6 +486,16 @@
               <span class="acro">${escapeHtml(row.acronyme || "—")}</span>
               <span class="badge ${sourceClass}">${escapeHtml(row.source)}</span>
               ${row.annee ? `<span class="badge">${row.annee}</span>` : ""}
+              ${
+                row.isNew
+                  ? `<span class="badge new" title="Projet apparu lors du dernier rafraîchissement des données">Nouveau</span>`
+                  : ""
+              }
+              ${
+                row.firstSeen
+                  ? `<span class="badge mute" title="Date de première apparition dans cet explorateur">vu ${escapeHtml(formatFrDate(row.firstSeen) || row.firstSeen)}</span>`
+                  : ""
+              }
               ${regionBadges}
               ${row.coordinateur ? `<span class="badge gold">Coordinateur</span>` : ""}
               ${row.programme ? `<span class="badge mute">${escapeHtml(row.programme)}</span>` : ""}
@@ -536,6 +556,12 @@
       ["Catégorie ANR", row.source],
       ["Titre", row.titre],
       ["Code décision", row.code],
+      [
+        "Première apparition",
+        row.firstSeen
+          ? `${formatFrDate(row.firstSeen) || row.firstSeen}${row.isNew ? " · Nouveau" : ""}`
+          : null,
+      ],
       ["Année / édition", [row.annee, row.edition].filter(Boolean).join(" · ")],
       ["Programme", row.programme],
       ["Montant projet ANR", euro(row.montant_projet)],
@@ -688,6 +714,7 @@
     });
 
     els.coordOnly.addEventListener("change", applyFilters);
+    els.newOnly?.addEventListener("change", applyFilters);
     els.sort.addEventListener("change", applyFilters);
 
     els.orgPostChips.addEventListener("click", (e) => {
@@ -710,6 +737,11 @@
         applyFilters();
         return;
       }
+      if (btn.dataset.removeNew) {
+        if (els.newOnly) els.newOnly.checked = false;
+        applyFilters();
+        return;
+      }
       const facet = btn.dataset.removeFacet;
       const value = btn.dataset.value != null ? decodeURIComponent(btn.dataset.value) : null;
       if (facet && value != null) {
@@ -722,6 +754,7 @@
     els.reset.addEventListener("click", () => {
       els.q.value = "";
       els.coordOnly.checked = false;
+      if (els.newOnly) els.newOnly.checked = false;
       els.sort.value = "annee-desc";
       if (els.orgPostSearch) els.orgPostSearch.value = "";
       document.querySelectorAll(".facet-search").forEach((i) => (i.value = ""));

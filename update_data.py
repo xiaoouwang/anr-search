@@ -218,10 +218,93 @@ def build_records(proj_path: Path, part_path: Path, source: str) -> list[dict]:
     return records
 
 
+def project_key(source: str, code: str | None) -> str | None:
+    if not source or not code:
+        return None
+    return f"{source}|{code}"
+
+
+def load_first_seen() -> dict[str, str]:
+    """Map 'SOURCE|CODE' -> YYYY-MM-DD of first appearance in this explorer."""
+    seen: dict[str, str] = {}
+    path = WEB_DIR / "first_seen.json"
+    if path.exists():
+        try:
+            raw = json.loads(path.read_text(encoding="utf-8"))
+            if isinstance(raw, dict):
+                for k, v in raw.items():
+                    if isinstance(k, str) and isinstance(v, str) and len(v) >= 10:
+                        seen[k] = v[:10]
+        except Exception:
+            pass
+    # Backfill from previous data.json if present
+    data_path = WEB_DIR / "data.json"
+    if data_path.exists():
+        try:
+            prev = json.loads(data_path.read_text(encoding="utf-8"))
+            for row in prev.get("rows") or []:
+                key = project_key(row.get("s") or "DGDS", row.get("c"))
+                fs = row.get("fs")
+                if key and isinstance(fs, str) and len(fs) >= 10 and key not in seen:
+                    seen[key] = fs[:10]
+        except Exception:
+            pass
+    return seen
+
+
+def apply_first_seen(records: list[dict]) -> tuple[list[dict], dict[str, str], int]:
+    """
+    Attach fs (first seen date) and n (1 = new this build).
+    Putting the dataset update date on every card would not distinguish new projects;
+    we track when each project code first appeared in our data.
+    """
+    prev = load_first_seen()
+    had_history = len(prev) > 0
+    today = datetime.now(timezone.utc).date().isoformat()
+    updated: dict[str, str] = dict(prev)
+    new_count = 0
+
+    # Resolve per project once
+    project_fs: dict[str, str] = {}
+    project_new: dict[str, bool] = {}
+    for row in records:
+        key = project_key(row.get("s"), row.get("c"))
+        if not key or key in project_fs:
+            continue
+        if key in prev:
+            project_fs[key] = prev[key]
+            project_new[key] = False
+        else:
+            project_fs[key] = today
+            # Only mark "Nouveau" if we already had a history (not the bootstrap run)
+            project_new[key] = had_history
+            updated[key] = today
+            if had_history:
+                new_count += 1
+
+    for row in records:
+        key = project_key(row.get("s"), row.get("c"))
+        if not key:
+            row["fs"] = today
+            row["n"] = 0
+            continue
+        row["fs"] = project_fs.get(key, today)
+        row["n"] = 1 if project_new.get(key) else 0
+
+    return records, updated, new_count
+
+
 def build_payload(pairs: list[tuple[str, Path, Path]]) -> dict:
     records: list[dict] = []
     for source, proj_path, part_path in pairs:
         records.extend(build_records(proj_path, part_path, source))
+
+    records, first_seen_map, new_count = apply_first_seen(records)
+    (WEB_DIR / "first_seen.json").write_text(
+        json.dumps(first_seen_map, ensure_ascii=False, separators=(",", ":")) + "\n",
+        encoding="utf-8",
+    )
+    print(f"First-seen registry: {len(first_seen_map)} projects ({new_count} new this build)")
 
     facets = {
         "sources": sorted({row["s"] for row in records if row["s"]}),
@@ -231,7 +314,7 @@ def build_payload(pairs: list[tuple[str, Path, Path]]) -> dict:
         "programmes": sorted({row["p"] for row in records if row["p"]}, key=lambda s: s.lower()),
         "villes": sorted({row["v"] for row in records if row["v"]}, key=lambda s: s.lower()),
     }
-    return {"facets": facets, "rows": records}
+    return {"facets": facets, "rows": records, "new_projects": new_count}
 
 
 def local_paths(source_key: str, fmt: str) -> tuple[Path, Path]:
@@ -409,6 +492,7 @@ def main() -> None:
         },
         "built_at": datetime.now(timezone.utc).isoformat(),
         "rows": len(payload["rows"]),
+        "new_projects": payload.get("new_projects", 0),
         "data_json_mb": round(out.stat().st_size / 1e6, 2),
     }
     # Prefer resource dates if dataset_last_modified missing

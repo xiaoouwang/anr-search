@@ -513,6 +513,7 @@ select:focus,
 .badge.mute { background: #eef1f4; color: var(--muted); }
 .badge.source-dgds { background: #e4eef8; color: #1f4f7a; }
 .badge.source-dgpie { background: #e8f3ea; color: #2a5c34; }
+.badge.new { background: #fde8e4; color: #9b2c1f; font-weight: 700; }
 
 .source-list label {
   font-weight: 500;

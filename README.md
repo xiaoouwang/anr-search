@@ -127,6 +127,16 @@ anr-search/
 
 Champ `s` dans chaque ligne de `data.json` : `"DGDS"` ou `"DGPIE"`.
 
+### Repérer les nouveaux projets
+
+Mettre la date de mise à jour du jeu data.gouv.fr sur chaque carte ne distinguerait pas les projets déjà connus des nouveaux. À la place :
+
+- `web/first_seen.json` mémorise la **date de première apparition** de chaque code (`SOURCE|CODE` → `YYYY-MM-DD`)
+- chaque ligne a `fs` (cette date) et `n` (`1` = apparu lors du dernier rafraîchissement)
+- badge **Nouveau** + filtre « Nouveaux projets uniquement »
+
+Au premier déploiement de cette fonctionnalité, tous les projets existants sont enregistrés sans badge « Nouveau » ; seuls les codes absents du registre au prochain `update_data.py` seront marqués.
+
 ---
 
 ## Réutiliser / adapter
