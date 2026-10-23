@@ -32,6 +32,30 @@ html, body {
   padding: 28px 22px 64px;
 }
 
+.credits {
+  margin-top: 36px;
+  padding: 22px 8px 0;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.credits p {
+  margin: 0 0 8px;
+  max-width: 46rem;
+}
+
+.credits strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.credits a {
+  color: var(--sea-deep);
+  text-underline-offset: 2px;
+}
+
 .hero { padding: 18px 8px 22px; }
 
 .kicker {
