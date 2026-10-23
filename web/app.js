@@ -502,9 +502,9 @@
     els.next.disabled = page >= totalPages - 1;
   }
 
-  function googleSearchUrl(code) {
-    if (!code) return null;
-    return `https://www.google.com/search?q=${encodeURIComponent(`"${code}"`)}`;
+  function googleSearchUrl(query) {
+    if (!query) return null;
+    return `https://www.google.com/search?q=${encodeURIComponent(`"${query}"`)}`;
   }
 
   function openDetail(raw) {
@@ -528,18 +528,28 @@
       ["Coordinateur", row.coordinateur ? "Oui" : "Non"],
       ["DOI", row.doi],
     ];
-    const gUrl = googleSearchUrl(row.code);
-    const googleHtml = gUrl
-      ? `<p class="detail-google">
-          <a class="btn ghost" href="${escapeHtml(gUrl)}" target="_blank" rel="noopener noreferrer">
-            Rechercher « ${escapeHtml(row.code)} » sur Google
-          </a>
+    const gCode = googleSearchUrl(row.code);
+    const gTitle = googleSearchUrl(row.titre);
+    const googleLinks = [];
+    if (gCode) {
+      googleLinks.push(
+        `<a class="btn ghost" href="${escapeHtml(gCode)}" target="_blank" rel="noopener noreferrer">Google · code</a>`
+      );
+    }
+    if (gTitle) {
+      googleLinks.push(
+        `<a class="btn ghost" href="${escapeHtml(gTitle)}" target="_blank" rel="noopener noreferrer">Google · titre</a>`
+      );
+    }
+    const googleHtml = googleLinks.length
+      ? `<div class="detail-google">
+          ${googleLinks.join("")}
           ${
             row.doi
               ? ""
-              : `<span class="muted-inline">Pas de DOI — recherche par code décision</span>`
+              : `<span class="muted-inline">Pas de DOI — recherche Google disponible</span>`
           }
-        </p>`
+        </div>`
       : "";
     const partnersHtml = meta.partenaires.length
       ? `<div class="partners detail-partners">
