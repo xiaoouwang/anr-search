@@ -275,13 +275,54 @@ def main() -> None:
     meta_sources: dict = {}
     downloaded = False
 
+    def enrich_source_meta(key: str, entry: dict) -> dict:
+        """Ensure page/api/dates are present; fetch dataset last_modified if missing."""
+        cfg = SOURCES[key]
+        out = dict(entry or {})
+        out.setdefault("page", dataset_page(cfg["slug"]))
+        out.setdefault("api", dataset_api(cfg["slug"]))
+        if out.get("dataset_last_modified") and out.get("projets") and out.get("partenaires"):
+            return out
+        try:
+            print(f"  refreshing {key} dataset metadata for dates…")
+            meta = http_json(dataset_api(cfg["slug"]))
+            out["dataset_last_modified"] = meta.get("last_modified")
+            resources = meta.get("resources") or []
+            if not out.get("projets"):
+                proj_res = pick_resource(resources, "projets", prefer_format=args.format)
+                out["projets"] = {
+                    "id": proj_res.get("id"),
+                    "title": proj_res.get("title"),
+                    "last_modified": proj_res.get("last_modified"),
+                    "format": proj_res.get("format"),
+                    "url": proj_res.get("latest") or proj_res.get("url"),
+                }
+            if not out.get("partenaires"):
+                part_res = pick_resource(resources, "partenaires", prefer_format=args.format)
+                out["partenaires"] = {
+                    "id": part_res.get("id"),
+                    "title": part_res.get("title"),
+                    "last_modified": part_res.get("last_modified"),
+                    "format": part_res.get("format"),
+                    "url": part_res.get("latest") or part_res.get("url"),
+                }
+        except Exception as exc:
+            print(f"  warning: could not refresh {key} metadata ({exc})")
+        return out
+
     if args.rebuild and not args.force:
         print("Rebuilding from local raw/ (no remote check)…")
         for key in SOURCES:
             entry = prev.get(key) or {}
+            # Migrate legacy flat state (DGDS-only) if needed
+            if key == "DGDS" and "projets" in prev and "DGDS" not in prev:
+                entry = {
+                    "projets": prev.get("projets"),
+                    "partenaires": prev.get("partenaires"),
+                }
             proj_path, part_path = resolve_existing_paths(key, args.format, entry)
             pairs.append((key, proj_path, part_path))
-            meta_sources[key] = entry
+            meta_sources[key] = enrich_source_meta(key, entry)
     else:
         state: dict = {}
         for key, cfg in SOURCES.items():
@@ -370,6 +411,17 @@ def main() -> None:
         "rows": len(payload["rows"]),
         "data_json_mb": round(out.stat().st_size / 1e6, 2),
     }
+    # Prefer resource dates if dataset_last_modified missing
+    for key, info in meta_out["sources"].items():
+        if info.get("dataset_last_modified"):
+            continue
+        dates = [
+            (info.get("projets") or {}).get("last_modified"),
+            (info.get("partenaires") or {}).get("last_modified"),
+        ]
+        dates = [d for d in dates if d]
+        if dates:
+            info["dataset_last_modified"] = max(dates)
     (WEB_DIR / "meta.json").write_text(
         json.dumps(meta_out, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
     )

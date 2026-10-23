@@ -5,9 +5,21 @@
       "hint": "Plan d'action / science",
       "page": "https://www.data.gouv.fr/datasets/anr-01-projets-anr-dos-et-dgds-detail-des-projets-et-des-partenaires",
       "api": "https://www.data.gouv.fr/api/1/datasets/anr-01-projets-anr-dos-et-dgds-detail-des-projets-et-des-partenaires/",
-      "dataset_last_modified": null,
-      "projets": null,
-      "partenaires": null,
+      "dataset_last_modified": "2026-10-08T17:30:15.122000+00:00",
+      "projets": {
+        "id": "8361d9ce-7426-40dc-8803-2807783db4c2",
+        "title": "anr-dgds-depuis-2010-projets-finances-20261002-projets.xlsx",
+        "last_modified": "2026-10-01T22:20:30.211000+00:00",
+        "format": "xlsx",
+        "url": "https://www.data.gouv.fr/api/1/datasets/r/8361d9ce-7426-40dc-8803-2807783db4c2"
+      },
+      "partenaires": {
+        "id": "a174712b-8446-4d15-b65d-0a875ea16a38",
+        "title": "anr-dgds-depuis-2010-projets-finances-20261002-partenaires.xlsx",
+        "last_modified": "2026-10-01T22:20:32.345000+00:00",
+        "format": "xlsx",
+        "url": "https://www.data.gouv.fr/api/1/datasets/r/a174712b-8446-4d15-b65d-0a875ea16a38"
+      },
       "rows": 83834
     },
     "DGPIE": {
@@ -15,9 +27,21 @@
       "hint": "Investissements d'avenir (PIA)",
       "page": "https://www.data.gouv.fr/datasets/anr-02-projets-anr-dgpie-detail-des-projets-et-des-partenaires",
       "api": "https://www.data.gouv.fr/api/1/datasets/anr-02-projets-anr-dgpie-detail-des-projets-et-des-partenaires/",
-      "dataset_last_modified": null,
-      "projets": null,
-      "partenaires": null,
+      "dataset_last_modified": "2026-10-01T22:50:02.069000+00:00",
+      "projets": {
+        "id": "eaed80ff-79e5-4eba-bf91-d93599f2032a",
+        "title": "anr-dgpie-depuis-2010-projets-finances-20261002-projets.xlsx",
+        "last_modified": "2026-10-01T22:49:54.426000+00:00",
+        "format": "xlsx",
+        "url": "https://www.data.gouv.fr/api/1/datasets/r/eaed80ff-79e5-4eba-bf91-d93599f2032a"
+      },
+      "partenaires": {
+        "id": "3eb8c4a5-0dee-43e0-8e61-34d634cd7b6b",
+        "title": "anr-dgpie-depuis-2010-projets-finances-20261002-partenaires.xlsx",
+        "last_modified": "2026-10-01T22:49:55.950000+00:00",
+        "format": "xlsx",
+        "url": "https://www.data.gouv.fr/api/1/datasets/r/3eb8c4a5-0dee-43e0-8e61-34d634cd7b6b"
+      },
       "rows": 16976
     }
   },

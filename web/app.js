@@ -716,32 +716,48 @@
     });
   }
 
+  function sourceUpdatedAt(info) {
+    if (!info) return null;
+    if (info.dataset_last_modified) return info.dataset_last_modified;
+    const dates = [info.projets?.last_modified, info.partenaires?.last_modified].filter(Boolean);
+    if (!dates.length) return null;
+    return dates.sort().at(-1);
+  }
+
   async function loadMeta() {
     if (!els.dataMeta) return;
     try {
       const res = await fetch("meta.json");
       if (!res.ok) return;
       const meta = await res.json();
-      const built = formatFrDate(meta.built_at);
-      const bits = [];
-      if (built) bits.push(`données régénérées le ${built}`);
       const sources = meta.sources || {};
-      const links = Object.entries(sources)
-        .map(([key, info]) => {
-          const href = info.page || "#";
-          const n = info.rows != null ? ` (${Number(info.rows).toLocaleString("fr-FR")})` : "";
-          return `<a href="${escapeHtml(href)}" target="_blank" rel="noopener">${escapeHtml(key)}</a>${n}`;
-        })
-        .join(" · ");
-      if (links) bits.push(links);
-      else if (meta.source_page) {
-        bits.push(
-          `<a href="${escapeHtml(meta.source_page)}" target="_blank" rel="noopener">source ANR</a>`
+      const order = ["DGDS", "DGPIE", ...Object.keys(sources).filter((k) => k !== "DGDS" && k !== "DGPIE")];
+      const lines = [];
+      for (const key of order) {
+        const info = sources[key];
+        if (!info) continue;
+        const label = info.label || key;
+        const hint = info.hint ? ` (${escapeHtml(info.hint)})` : "";
+        const updated = formatFrDate(sourceUpdatedAt(info));
+        const rows =
+          info.rows != null ? `${Number(info.rows).toLocaleString("fr-FR")} lignes` : null;
+        const href = info.page || "#";
+        const parts = [
+          `<span class="src-label">${escapeHtml(label)}</span>${hint}`,
+          updated ? `mise à jour data.gouv.fr : ${updated}` : null,
+          rows,
+          `<a href="${escapeHtml(href)}" target="_blank" rel="noopener">source</a>`,
+        ].filter(Boolean);
+        lines.push(`<p class="data-meta-line">${parts.join(" · ")}</p>`);
+      }
+      if (!lines.length && meta.source_page) {
+        lines.push(
+          `<p class="data-meta-line"><a href="${escapeHtml(meta.source_page)}" target="_blank" rel="noopener">source ANR</a></p>`
         );
       }
-      if (!bits.length) return;
+      if (!lines.length) return;
       els.dataMeta.hidden = false;
-      els.dataMeta.innerHTML = bits.join(" · ");
+      els.dataMeta.innerHTML = lines.join("");
     } catch {
       /* optional */
     }

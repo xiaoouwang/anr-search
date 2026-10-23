@@ -67,10 +67,21 @@ html, body {
 
 .data-meta {
   max-width: 46rem;
-  margin: 10px 0 0;
+  margin: 12px 0 0;
   color: var(--muted);
   font-size: 0.85rem;
-  line-height: 1.4;
+  line-height: 1.45;
+  display: grid;
+  gap: 6px;
+}
+
+.data-meta-line {
+  margin: 0;
+}
+
+.data-meta .src-label {
+  font-weight: 600;
+  color: var(--ink);
 }
 
 .data-meta a {
