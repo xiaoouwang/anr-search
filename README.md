@@ -6,8 +6,8 @@ Explorateur web des **projets et partenaires ANR** (depuis 2010), toutes région
 |---|---|
 | **Site (GitHub Pages)** | [https://xiaoouwang.github.io/anr-search/](https://xiaoouwang.github.io/anr-search/) |
 | **Dépôt GitHub** | [https://github.com/xiaoouwang/anr-search](https://github.com/xiaoouwang/anr-search) |
-| **Dépôt GitLab (Huma-Num)** | [https://gitlab.huma-num.fr/xwang1/anr-search](https://gitlab.huma-num.fr/xwang1/anr-search) |
-| **Site (GitLab Pages)** | [https://xwang1.gitlab.huma-num.fr/anr-search/](https://xwang1.gitlab.huma-num.fr/anr-search/) *(après premier pipeline Pages)* |
+| **Dépôt GitLab (Huma-Num)** | [https://gitlab.huma-num.fr/mshs-sud-est/anr-search](https://gitlab.huma-num.fr/mshs-sud-est/anr-search) |
+| **Site (GitLab Pages)** | [https://mshs-sud-est.gitlab.huma-num.fr/anr-search/](https://mshs-sud-est.gitlab.huma-num.fr/anr-search/) *(confirmée dans Deploy → Pages)* |
 | **Auteur** | [Xiaoou Wang](https://xiaoouwang.github.io/) — [ingénieur en humanités numériques](https://mshs.univ-cotedazur.fr/services/humanites-numeriques), MSHS Sud-Est, Université Côte d’Azur |
 
 ---
@@ -80,16 +80,16 @@ Fichier : [`.gitlab-ci.yml`](.gitlab-ci.yml)
 
 #### Activer sur gitlab.huma-num.fr
 
-1. Pousser ce dépôt vers [gitlab.huma-num.fr/xwang1/anr-search](https://gitlab.huma-num.fr/xwang1/anr-search).
+1. Pousser ce dépôt vers [gitlab.huma-num.fr/mshs-sud-est/anr-search](https://gitlab.huma-num.fr/mshs-sud-est/anr-search).
 2. **Settings → General → Visibility** : Pages / projet selon votre politique Huma-Num.
 3. **Settings → CI/CD → Schedules** : créer un schedule (ex. `0 5 * * 1`, branche `main`) pour le refresh hebdomadaire.
-4. Pour que `update-data` puisse **pousser** les JSON mis à jour :
-   - créer un **Project Access Token** (Maintainer, scope `write_repository`) ;
-   - l’enregistrer en variable CI/CD masquée `GIT_PUSH_TOKEN` ;
-   - *ou* autoriser le *CI job token* à écrire sur le dépôt (Settings → CI/CD → Job token permissions).
+4. Pour que `update-data` puisse **pousser** les JSON mis à jour **sur ce projet** :
+   - créer un **Project Access Token** *dans* `mshs-sud-est/anr-search` (Maintainer, scope `write_repository`) ;
+   - l’enregistrer en variable CI/CD masquée `GIT_PUSH_TOKEN` *sur le même projet* ;
+   - un token créé sur un ancien chemin (`xwang1/…`) ne fonctionne pas après transfert.
 5. Lancer une fois **CI/CD → Pipelines → Run pipeline** : le job `pages` déploie le site.
 
-URL Pages typique Huma-Num : `https://xwang1.gitlab.huma-num.fr/anr-search/` (confirmée dans **Deploy → Pages** après le premier succès).
+URL Pages typique : `https://mshs-sud-est.gitlab.huma-num.fr/anr-search/` (voir **Deploy → Pages**).
 
 Fichiers produits côté site :
 

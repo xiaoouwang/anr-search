@@ -31,14 +31,13 @@ update-data:
         echo "No data changes to commit."
       else
         git commit -m "chore: refresh ANR data from data.gouv.fr"
-        # Prefer GIT_PUSH_TOKEN (Project Access Token, role Maintainer, scope write_repository).
-        # Fallback: CI_JOB_TOKEN if "CI job token" may push to this project (Settings → CI/CD → Job token).
-        AUTH_TOKEN="${GIT_PUSH_TOKEN:-$CI_JOB_TOKEN}"
-        AUTH_USER="oauth2"
+        # Requires GIT_PUSH_TOKEN = Project Access Token on THIS project
+        # (Maintainer + write_repository). CI_JOB_TOKEN usually cannot push.
         if [ -z "${GIT_PUSH_TOKEN:-}" ]; then
-          AUTH_USER="gitlab-ci-token"
+          echo "ERROR: set CI/CD variable GIT_PUSH_TOKEN (Project Access Token, write_repository) on ${CI_PROJECT_PATH}"
+          exit 1
         fi
-        git push "https://${AUTH_USER}:${AUTH_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git" "HEAD:${CI_DEFAULT_BRANCH}"
+        git push "https://oauth2:${GIT_PUSH_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git" "HEAD:${CI_DEFAULT_BRANCH}"
       fi
 
 # Static site from web/ → GitLab Pages (compatible with older GitLab: copy into public/)
