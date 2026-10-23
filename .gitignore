@@ -1,0 +1,19 @@
+# Local downloads / caches
+raw/
+*.xlsx
+*.xls
+*.csv
+!requirements.txt
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+
+# OS / editor
+.DS_Store
+*.log
+.idea/
+.vscode/

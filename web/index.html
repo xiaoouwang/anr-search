@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ANR — explorateur projets &amp; partenaires</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="app.css" />
+</head>
+<body>
+  <div class="shell">
+    <header class="hero">
+      <p class="kicker">ANR · depuis 2010</p>
+      <h1>Projets &amp; partenaires<br /><em>toutes régions</em></h1>
+      <p class="lede">
+        Explorez <strong id="total-count">—</strong> lignes partenaires
+        (fusion projets + organismes). Chaque filtre accepte plusieurs choix.
+      </p>
+      <p class="data-meta" id="data-meta" hidden></p>
+      <div class="hero-stats" id="hero-stats" hidden>
+        <div><span id="stat-rows">0</span><label>résultats</label></div>
+        <div><span id="stat-projets">0</span><label>projets</label></div>
+        <div><span id="stat-aide">—</span><label>aide partenaires</label></div>
+      </div>
+      <div class="active-chips" id="active-chips" hidden></div>
+    </header>
+
+    <div class="workspace">
+      <aside class="filters" aria-label="Filtres">
+        <div class="filter-block check">
+          <label>
+            <input type="checkbox" id="coord-only" />
+            Coordinateur uniquement
+          </label>
+        </div>
+
+        <div class="filter-block">
+          <label for="q">Recherche</label>
+          <input id="q" type="search" placeholder="Acronyme, titre, organisme, responsable…" autocomplete="off" />
+        </div>
+
+        <div class="filter-block" data-facet="annees">
+          <div class="facet-head">
+            <label>Années</label>
+            <button type="button" class="linkish clear-facet" data-clear="annees">Effacer</button>
+          </div>
+          <div class="check-grid" id="facet-annees"></div>
+        </div>
+
+        <div class="filter-block" data-facet="regions">
+          <div class="facet-head">
+            <label>Régions</label>
+            <button type="button" class="linkish clear-facet" data-clear="regions">Effacer</button>
+          </div>
+          <div class="check-list" id="facet-regions"></div>
+        </div>
+
+        <div class="filter-block" data-facet="categories">
+          <div class="facet-head">
+            <label>Catégories d’organisme</label>
+            <button type="button" class="linkish clear-facet" data-clear="categories">Effacer</button>
+          </div>
+          <div class="check-list" id="facet-categories"></div>
+        </div>
+
+        <div class="filter-block" data-facet="programmes">
+          <div class="facet-head">
+            <label>Programmes</label>
+            <button type="button" class="linkish clear-facet" data-clear="programmes">Effacer</button>
+          </div>
+          <input type="search" class="facet-search" data-search="programmes" placeholder="Filtrer les programmes…" />
+          <div class="check-list tall" id="facet-programmes"></div>
+        </div>
+
+        <div class="filter-block" data-facet="villes">
+          <div class="facet-head">
+            <label>Villes</label>
+            <button type="button" class="linkish clear-facet" data-clear="villes">Effacer</button>
+          </div>
+          <input type="search" class="facet-search" data-search="villes" placeholder="Filtrer les villes…" />
+          <div class="facet-bulk" id="villes-bulk" hidden>
+            <button type="button" id="villes-select-all" class="btn ghost mini">
+              Tout sélectionner (<span id="villes-match-count">0</span>)
+            </button>
+          </div>
+          <div class="check-list tall" id="facet-villes"></div>
+        </div>
+
+        <div class="filter-block">
+          <label for="sort">Trier par</label>
+          <select id="sort">
+            <option value="annee-desc">Année (récent → ancien)</option>
+            <option value="annee-asc">Année (ancien → récent)</option>
+            <option value="aide-desc">Aide partenaire ↓</option>
+            <option value="acro">Acronyme A→Z</option>
+            <option value="org">Organisme A→Z</option>
+            <option value="region">Région A→Z</option>
+          </select>
+        </div>
+
+        <div class="filter-actions">
+          <button type="button" id="reset" class="btn ghost">Réinitialiser</button>
+          <button type="button" id="export" class="btn">Exporter CSV</button>
+        </div>
+      </aside>
+
+      <main class="results" aria-live="polite">
+        <section class="org-postfilter" id="org-postfilter" hidden>
+          <div class="facet-head">
+            <label>
+              Affiner par organisme
+              <span class="muted-inline" id="org-post-meta"></span>
+            </label>
+            <button type="button" class="linkish" id="org-post-clear">Effacer</button>
+          </div>
+          <p class="hint">
+            Organismes présents dans le résultat actuel — cliquez pour filtrer davantage (plusieurs possibles).
+          </p>
+          <input
+            type="search"
+            id="org-post-search"
+            placeholder="Rechercher parmi ces organismes…"
+            autocomplete="off"
+          />
+          <div class="chip-row selectable" id="org-post-chips"></div>
+        </section>
+        <div id="status" class="status">Chargement des données (fichier volumineux, ~30&nbsp;Mo)…</div>
+        <div id="list" class="list"></div>
+        <div class="pager" id="pager" hidden>
+          <button type="button" id="prev" class="btn ghost">Précédent</button>
+          <span id="page-info"></span>
+          <button type="button" id="next" class="btn ghost">Suivant</button>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <dialog id="detail">
+    <form method="dialog" class="detail-sheet">
+      <header>
+        <h2 id="d-title"></h2>
+        <button value="close" class="btn ghost" aria-label="Fermer">Fermer</button>
+      </header>
+      <div id="d-body"></div>
+    </form>
+  </dialog>
+
+  <script src="app.js"></script>
+</body>
+</html>
