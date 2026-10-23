@@ -507,6 +507,27 @@
     return `https://www.google.com/search?q=${encodeURIComponent(`"${query}"`)}`;
   }
 
+  /** Official ANR project page: https://anr.fr/Projet-{code} */
+  function anrProjectUrl(code) {
+    if (!code) return null;
+    const c = String(code).trim();
+    if (!c) return null;
+    return `https://anr.fr/Projet-${encodeURIComponent(c)}`;
+  }
+
+  function formatFieldValue(k, v, row) {
+    if (k === "DOI" && v) {
+      return `<a href="${escapeHtml(doiUrl(v))}" target="_blank" rel="noreferrer">${escapeHtml(v)}</a>`;
+    }
+    if (k === "Code décision" && v) {
+      const href = anrProjectUrl(v);
+      return href
+        ? `<a href="${escapeHtml(href)}" target="_blank" rel="noopener noreferrer">${escapeHtml(v)}</a>`
+        : escapeHtml(v);
+    }
+    return escapeHtml(v);
+  }
+
   function openDetail(raw) {
     const row = expand(raw);
     const meta = projectMeta(raw);
@@ -528,26 +549,32 @@
       ["Coordinateur", row.coordinateur ? "Oui" : "Non"],
       ["DOI", row.doi],
     ];
+    const anrUrl = anrProjectUrl(row.code);
     const gCode = googleSearchUrl(row.code);
     const gTitle = googleSearchUrl(row.titre);
-    const googleLinks = [];
+    const extLinks = [];
+    if (anrUrl) {
+      extLinks.push(
+        `<a class="btn" href="${escapeHtml(anrUrl)}" target="_blank" rel="noopener noreferrer">Fiche ANR</a>`
+      );
+    }
     if (gCode) {
-      googleLinks.push(
+      extLinks.push(
         `<a class="btn ghost" href="${escapeHtml(gCode)}" target="_blank" rel="noopener noreferrer">Google · code</a>`
       );
     }
     if (gTitle) {
-      googleLinks.push(
+      extLinks.push(
         `<a class="btn ghost" href="${escapeHtml(gTitle)}" target="_blank" rel="noopener noreferrer">Google · titre</a>`
       );
     }
-    const googleHtml = googleLinks.length
+    const linksHtml = extLinks.length
       ? `<div class="detail-google">
-          ${googleLinks.join("")}
+          ${extLinks.join("")}
           ${
             row.doi
               ? ""
-              : `<span class="muted-inline">Pas de DOI — recherche Google disponible</span>`
+              : `<span class="muted-inline">Pas de DOI — fiche ANR / Google disponibles</span>`
           }
         </div>`
       : "";
@@ -570,15 +597,11 @@
           .filter(([, v]) => v != null && v !== "" && v !== "—")
           .map(
             ([k, v]) =>
-              `<div><span class="k">${escapeHtml(k)}</span><span>${
-                k === "DOI" && v
-                  ? `<a href="${escapeHtml(doiUrl(v))}" target="_blank" rel="noreferrer">${escapeHtml(v)}</a>`
-                  : escapeHtml(v)
-              }</span></div>`
+              `<div><span class="k">${escapeHtml(k)}</span><span>${formatFieldValue(k, v, row)}</span></div>`
           )
           .join("")}
       </div>
-      ${googleHtml}
+      ${linksHtml}
       ${partnersHtml}`;
     els.detail.showModal();
   }
