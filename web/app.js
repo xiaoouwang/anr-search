@@ -502,6 +502,11 @@
     els.next.disabled = page >= totalPages - 1;
   }
 
+  function googleSearchUrl(code) {
+    if (!code) return null;
+    return `https://www.google.com/search?q=${encodeURIComponent(`"${code}"`)}`;
+  }
+
   function openDetail(raw) {
     const row = expand(raw);
     const meta = projectMeta(raw);
@@ -523,6 +528,19 @@
       ["Coordinateur", row.coordinateur ? "Oui" : "Non"],
       ["DOI", row.doi],
     ];
+    const gUrl = googleSearchUrl(row.code);
+    const googleHtml = gUrl
+      ? `<p class="detail-google">
+          <a class="btn ghost" href="${escapeHtml(gUrl)}" target="_blank" rel="noopener noreferrer">
+            Rechercher « ${escapeHtml(row.code)} » sur Google
+          </a>
+          ${
+            row.doi
+              ? ""
+              : `<span class="muted-inline">Pas de DOI — recherche par code décision</span>`
+          }
+        </p>`
+      : "";
     const partnersHtml = meta.partenaires.length
       ? `<div class="partners detail-partners">
           <span class="partners-label">Tous les partenaires (${meta.partenaires.length})</span>
@@ -550,6 +568,7 @@
           )
           .join("")}
       </div>
+      ${googleHtml}
       ${partnersHtml}`;
     els.detail.showModal();
   }

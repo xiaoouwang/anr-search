@@ -559,6 +559,18 @@ dialog::backdrop { background: rgba(16, 28, 42, 0.45); }
   font-weight: 600;
 }
 
+.detail-google {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 14px 0 6px;
+}
+
+.detail-google .btn {
+  text-decoration: none;
+}
+
 @media (max-width: 960px) {
   .workspace { grid-template-columns: 1fr; }
   .filters { position: static; max-height: none; }
