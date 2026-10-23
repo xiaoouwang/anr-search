@@ -1,22 +1,27 @@
 {
-  "source_page": "https://www.data.gouv.fr/datasets/anr-01-projets-anr-dos-et-dgds-detail-des-projets-et-des-partenaires",
-  "source_api": "https://www.data.gouv.fr/api/1/datasets/anr-01-projets-anr-dos-et-dgds-detail-des-projets-et-des-partenaires/",
-  "dataset_last_modified": "2026-10-08T17:30:15.122000+00:00",
-  "projets_resource": {
-    "title": "anr-dgds-depuis-2010-projets-finances-20261002-projets.xlsx",
-    "format": "xlsx",
-    "last_modified": "2026-10-01T22:20:30.211000+00:00",
-    "url": "https://www.data.gouv.fr/api/1/datasets/r/8361d9ce-7426-40dc-8803-2807783db4c2",
-    "id": "8361d9ce-7426-40dc-8803-2807783db4c2"
+  "sources": {
+    "DGDS": {
+      "label": "DGDS",
+      "hint": "Plan d'action / science",
+      "page": "https://www.data.gouv.fr/datasets/anr-01-projets-anr-dos-et-dgds-detail-des-projets-et-des-partenaires",
+      "api": "https://www.data.gouv.fr/api/1/datasets/anr-01-projets-anr-dos-et-dgds-detail-des-projets-et-des-partenaires/",
+      "dataset_last_modified": null,
+      "projets": null,
+      "partenaires": null,
+      "rows": 83834
+    },
+    "DGPIE": {
+      "label": "DGPIE",
+      "hint": "Investissements d'avenir (PIA)",
+      "page": "https://www.data.gouv.fr/datasets/anr-02-projets-anr-dgpie-detail-des-projets-et-des-partenaires",
+      "api": "https://www.data.gouv.fr/api/1/datasets/anr-02-projets-anr-dgpie-detail-des-projets-et-des-partenaires/",
+      "dataset_last_modified": null,
+      "projets": null,
+      "partenaires": null,
+      "rows": 16976
+    }
   },
-  "partenaires_resource": {
-    "title": "anr-dgds-depuis-2010-projets-finances-20261002-partenaires.xlsx",
-    "format": "xlsx",
-    "last_modified": "2026-10-01T22:20:32.345000+00:00",
-    "url": "https://www.data.gouv.fr/api/1/datasets/r/a174712b-8446-4d15-b65d-0a875ea16a38",
-    "id": "a174712b-8446-4d15-b65d-0a875ea16a38"
-  },
-  "built_at": "2026-10-23T10:07:32.860614+00:00",
-  "rows": 83834,
-  "data_json_mb": 30.74
+  "built_at": "2026-10-23T10:52:29.181467+00:00",
+  "rows": 100810,
+  "data_json_mb": 37.21
 }

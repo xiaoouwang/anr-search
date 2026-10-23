@@ -12,11 +12,11 @@
 <body>
   <div class="shell">
     <header class="hero">
-      <p class="kicker">ANR · depuis 2010</p>
+      <p class="kicker">ANR · depuis 2010 · DGDS &amp; DGPIE</p>
       <h1>Projets &amp; partenaires<br /><em>toutes régions</em></h1>
       <p class="lede">
         Explorez <strong id="total-count">—</strong> lignes partenaires
-        (fusion projets + organismes). Chaque filtre accepte plusieurs choix.
+        (DGDS et/ou DGPIE). Chaque filtre accepte plusieurs choix.
       </p>
       <p class="data-meta" id="data-meta" hidden></p>
       <div class="hero-stats" id="hero-stats" hidden>
@@ -29,6 +29,18 @@
 
     <div class="workspace">
       <aside class="filters" aria-label="Filtres">
+        <div class="filter-block" data-facet="sources">
+          <div class="facet-head">
+            <label>Catégorie ANR</label>
+            <button type="button" class="linkish clear-facet" data-clear="sources">Les deux</button>
+          </div>
+          <div class="check-list source-list" id="facet-sources"></div>
+          <p class="hint">
+            <strong>DGDS</strong> : Plan d’action ·
+            <strong>DGPIE</strong> : investissements d’avenir (PIA)
+          </p>
+        </div>
+
         <div class="filter-block check">
           <label>
             <input type="checkbox" id="coord-only" />
@@ -126,7 +138,7 @@
           />
           <div class="chip-row selectable" id="org-post-chips"></div>
         </section>
-        <div id="status" class="status">Chargement des données (fichier volumineux, ~30&nbsp;Mo)…</div>
+        <div id="status" class="status">Chargement des données (fichier volumineux, ~37&nbsp;Mo)…</div>
         <div id="list" class="list"></div>
         <div class="pager" id="pager" hidden>
           <button type="button" id="prev" class="btn ghost">Précédent</button>

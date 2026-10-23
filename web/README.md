@@ -3,7 +3,7 @@
 Interface web pour filtrer l’ensemble des projets / partenaires ANR (fusion des deux tables).
 
 - En ligne : [https://xiaoouwang.github.io/anr-search/](https://xiaoouwang.github.io/anr-search/)
-- Source : [ANR_01 sur data.gouv.fr](https://www.data.gouv.fr/datasets/anr-01-projets-anr-dos-et-dgds-detail-des-projets-et-des-partenaires)
+- Sources : [ANR_01 DGDS](https://www.data.gouv.fr/datasets/anr-01-projets-anr-dos-et-dgds-detail-des-projets-et-des-partenaires) · [ANR_02 DGPIE](https://www.data.gouv.fr/datasets/anr-02-projets-anr-dgpie-detail-des-projets-et-des-partenaires)
 
 ## Lancer en local
 

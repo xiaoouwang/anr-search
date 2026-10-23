@@ -4,7 +4,14 @@
   const ORG_CHIP_VISIBLE = 80;
 
   let rows = [];
-  let facets = { annees: [], regions: [], categories: [], programmes: [], villes: [] };
+  let facets = {
+    sources: [],
+    annees: [],
+    regions: [],
+    categories: [],
+    programmes: [],
+    villes: [],
+  };
   let baseFiltered = [];
   let filtered = [];
   /** @type {{ name: string, count: number }[]} */
@@ -13,8 +20,14 @@
   let projectIndex = new Map();
   let page = 0;
 
+  const SOURCE_HINT = {
+    DGDS: "Plan d’action / science",
+    DGPIE: "Investissements d’avenir (PIA)",
+  };
+
   /** @type {Record<string, Set<string>>} */
   const selected = {
+    sources: new Set(),
     annees: new Set(),
     regions: new Set(),
     categories: new Set(),
@@ -54,6 +67,7 @@
   };
 
   const expand = (r) => ({
+    source: r.s || "DGDS",
     code: r.c,
     acronyme: r.a,
     titre: r.t,
@@ -71,6 +85,8 @@
     region: r.r,
     aide_partenaire: r.h,
   });
+
+  const projectKey = (raw) => `${raw.s || "DGDS"}|${raw.c || ""}`;
 
   const euro = (n) => {
     if (n == null || Number.isNaN(n)) return "—";
@@ -177,7 +193,25 @@
     applyFilters();
   }
 
+  function selectAllSources() {
+    selected.sources = new Set(facets.sources.length ? facets.sources : ["DGDS", "DGPIE"]);
+  }
+
+  function renderSourcesFacet() {
+    const root = $("facet-sources");
+    if (!root) return;
+    const values = facets.sources.length ? facets.sources : ["DGDS", "DGPIE"];
+    root.innerHTML = values
+      .map((v) => {
+        const checked = selected.sources.has(v) ? "checked" : "";
+        const hint = SOURCE_HINT[v] ? ` — ${SOURCE_HINT[v]}` : "";
+        return `<label><input type="checkbox" data-facet="sources" value="${escapeHtml(v)}" ${checked} /> ${escapeHtml(v)}<span class="muted-inline">${escapeHtml(hint)}</span></label>`;
+      })
+      .join("");
+  }
+
   function renderAllFacets() {
+    renderSourcesFacet();
     renderFacet("annees", facets.annees.map(String), { grid: true });
     renderFacet("regions", facets.regions);
     renderFacet("categories", facets.categories);
@@ -195,6 +229,13 @@
         );
       }
     };
+    const allSources =
+      !facets.sources.length ||
+      (selected.sources.size === facets.sources.length &&
+        facets.sources.every((s) => selected.sources.has(s)));
+    if (selected.sources.size && !allSources) {
+      push("sources", "Source", selected.sources);
+    }
     push("annees", "Année", selected.annees);
     push("regions", "Région", selected.regions);
     push("categories", "Catégorie", selected.categories);
@@ -214,6 +255,15 @@
     const q = norm(els.q.value.trim());
     const tokens = q ? q.split(/\s+/).filter(Boolean) : [];
     const row = expand(raw);
+    // Empty source selection = none; partial = filter; all selected = no filter
+    if (selected.sources.size === 0) return false;
+    if (
+      facets.sources.length &&
+      selected.sources.size < facets.sources.length &&
+      !selected.sources.has(row.source)
+    ) {
+      return false;
+    }
     if (selected.annees.size && (row.annee == null || !selected.annees.has(String(row.annee)))) return false;
     if (selected.regions.size && !selected.regions.has(row.region || "")) return false;
     if (selected.categories.size && !selected.categories.has(row.categorie || "")) return false;
@@ -223,6 +273,7 @@
     if (tokens.length) {
       const hay = norm(
         [
+          row.source,
           row.acronyme,
           row.titre,
           row.organisme,
@@ -258,7 +309,10 @@
       if (!available.has(name)) selected.organismes.delete(name);
     }
 
+    const sourceNarrow =
+      facets.sources.length > 0 && selected.sources.size > 0 && selected.sources.size < facets.sources.length;
     const hasPrimary =
+      sourceNarrow ||
       selected.annees.size ||
       selected.regions.size ||
       selected.categories.size ||
@@ -335,8 +389,9 @@
     for (const raw of rows) {
       const code = raw.c;
       if (!code) continue;
-      if (!map.has(code)) map.set(code, { regionSet: new Set(), partenaires: [], seenOrg: new Set() });
-      const entry = map.get(code);
+      const key = projectKey(raw);
+      if (!map.has(key)) map.set(key, { regionSet: new Set(), partenaires: [], seenOrg: new Set() });
+      const entry = map.get(key);
       if (raw.r) entry.regionSet.add(raw.r);
       const orgKey = raw.o || "";
       if (orgKey && !entry.seenOrg.has(orgKey)) {
@@ -364,12 +419,13 @@
     }
   }
 
-  function projectMeta(code) {
-    return projectIndex.get(code) || { regions: [], partenaires: [] };
+  function projectMeta(rawOrKey) {
+    const key = typeof rawOrKey === "string" ? rawOrKey : projectKey(rawOrKey);
+    return projectIndex.get(key) || { regions: [], partenaires: [] };
   }
 
   function renderStats() {
-    const projets = new Set(filtered.map((r) => r.c).filter(Boolean)).size;
+    const projets = new Set(filtered.map((r) => projectKey(r)).filter((k) => !k.endsWith("|"))).size;
     const aide = filtered.reduce((s, r) => s + (r.h || 0), 0);
     els.statRows.textContent = filtered.length.toLocaleString("fr-FR");
     els.statProjets.textContent = projets.toLocaleString("fr-FR");
@@ -398,7 +454,8 @@
         const row = expand(raw);
         const idx = start + i;
         const resp = [row.resp_prenom, row.resp_nom].filter(Boolean).join(" ");
-        const meta = projectMeta(row.code);
+        const meta = projectMeta(raw);
+        const sourceClass = row.source === "DGPIE" ? "source-dgpie" : "source-dgds";
         const regionBadges = meta.regions
           .map((r) => {
             const highlight = r === row.region ? "badge" : "badge mute";
@@ -417,6 +474,7 @@
           <article class="card" data-idx="${idx}" tabindex="0" role="button">
             <div class="card-top">
               <span class="acro">${escapeHtml(row.acronyme || "—")}</span>
+              <span class="badge ${sourceClass}">${escapeHtml(row.source)}</span>
               ${row.annee ? `<span class="badge">${row.annee}</span>` : ""}
               ${regionBadges}
               ${row.coordinateur ? `<span class="badge gold">Coordinateur</span>` : ""}
@@ -446,9 +504,10 @@
 
   function openDetail(raw) {
     const row = expand(raw);
-    const meta = projectMeta(row.code);
+    const meta = projectMeta(raw);
     els.dTitle.textContent = row.acronyme || "Projet";
     const fields = [
+      ["Catégorie ANR", row.source],
       ["Titre", row.titre],
       ["Code décision", row.code],
       ["Année / édition", [row.annee, row.edition].filter(Boolean).join(" · ")],
@@ -497,7 +556,7 @@
 
   function exportCsv() {
     const cols = [
-      "code", "acronyme", "titre", "annee", "edition", "programme",
+      "source", "code", "acronyme", "titre", "annee", "edition", "programme",
       "montant_projet", "organisme", "categorie", "region", "ville",
       "resp_prenom", "resp_nom", "coordinateur", "aide_partenaire", "doi",
     ];
@@ -524,8 +583,20 @@
   }
 
   function clearFacet(name) {
+    if (name === "sources") {
+      selectAllSources();
+      renderSourcesFacet();
+      applyFilters();
+      return;
+    }
     selected[name].clear();
-    if (name === "programmes" || name === "villes" || name === "annees" || name === "regions" || name === "categories") {
+    if (
+      name === "programmes" ||
+      name === "villes" ||
+      name === "annees" ||
+      name === "regions" ||
+      name === "categories"
+    ) {
       renderAllFacets();
     }
     if (name === "organismes" && els.orgPostSearch) els.orgPostSearch.value = "";
@@ -603,6 +674,7 @@
       if (els.orgPostSearch) els.orgPostSearch.value = "";
       document.querySelectorAll(".facet-search").forEach((i) => (i.value = ""));
       Object.values(selected).forEach((s) => s.clear());
+      selectAllSources();
       renderAllFacets();
       applyFilters();
     });
@@ -651,14 +723,25 @@
       if (!res.ok) return;
       const meta = await res.json();
       const built = formatFrDate(meta.built_at);
-      const src = formatFrDate(meta.dataset_last_modified);
-      const page = meta.source_page || "https://www.data.gouv.fr/datasets/anr-01-projets-anr-dos-et-dgds-detail-des-projets-et-des-partenaires";
       const bits = [];
       if (built) bits.push(`données régénérées le ${built}`);
-      if (src) bits.push(`jeu data.gouv.fr mis à jour le ${src}`);
+      const sources = meta.sources || {};
+      const links = Object.entries(sources)
+        .map(([key, info]) => {
+          const href = info.page || "#";
+          const n = info.rows != null ? ` (${Number(info.rows).toLocaleString("fr-FR")})` : "";
+          return `<a href="${escapeHtml(href)}" target="_blank" rel="noopener">${escapeHtml(key)}</a>${n}`;
+        })
+        .join(" · ");
+      if (links) bits.push(links);
+      else if (meta.source_page) {
+        bits.push(
+          `<a href="${escapeHtml(meta.source_page)}" target="_blank" rel="noopener">source ANR</a>`
+        );
+      }
       if (!bits.length) return;
       els.dataMeta.hidden = false;
-      els.dataMeta.innerHTML = `${bits.join(" · ")} · <a href="${escapeHtml(page)}" target="_blank" rel="noopener">source ANR</a>`;
+      els.dataMeta.innerHTML = bits.join(" · ");
     } catch {
       /* optional */
     }
@@ -670,8 +753,16 @@
       const res = await fetch("data.json");
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const payload = await res.json();
-      facets = payload.facets;
+      facets = {
+        sources: payload.facets?.sources || [],
+        annees: payload.facets?.annees || [],
+        regions: payload.facets?.regions || [],
+        categories: payload.facets?.categories || [],
+        programmes: payload.facets?.programmes || [],
+        villes: payload.facets?.villes || [],
+      };
       rows = payload.rows;
+      selectAllSources();
       els.totalCount.textContent = rows.length.toLocaleString("fr-FR");
       buildProjectIndex();
       renderAllFacets();

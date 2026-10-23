@@ -466,6 +466,12 @@ select:focus,
 
 .badge.gold { background: #f7ecda; color: #8a5a16; }
 .badge.mute { background: #eef1f4; color: var(--muted); }
+.badge.source-dgds { background: #e4eef8; color: #1f4f7a; }
+.badge.source-dgpie { background: #e8f3ea; color: #2a5c34; }
+
+.source-list label {
+  font-weight: 500;
+}
 
 .acro { font-weight: 700; letter-spacing: 0.02em; }
 
