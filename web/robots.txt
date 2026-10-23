@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://mshs-sud-est.gitpages.huma-num.fr/anr-search/sitemap.xml

@@ -4,13 +4,108 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ANR — explorateur projets &amp; partenaires</title>
+  <title>Explorateur ANR — projets et partenaires (DGDS &amp; DGPIE) depuis 2010</title>
+  <meta name="description" content="Recherchez et filtrez les projets financés par l’ANR depuis 2010 (DGDS et DGPIE) : partenaires, régions, programmes, coordinateurs. Données ouvertes data.gouv.fr, MSHS Sud-Est." />
+  <meta name="keywords" content="ANR, Agence nationale de la recherche, DGDS, DGPIE, projets financés, partenaires, data.gouv.fr, recherche, PIA, France 2030, MSHS" />
+  <meta name="author" content="Xiaoou Wang, MSHS Sud-Est, Université Côte d’Azur" />
+  <meta name="robots" content="index, follow, max-image-preview:large" />
+  <meta name="theme-color" content="#0e6e6a" />
+  <link rel="canonical" href="https://mshs-sud-est.gitpages.huma-num.fr/anr-search/" />
+  <link rel="alternate" hreflang="fr" href="https://mshs-sud-est.gitpages.huma-num.fr/anr-search/" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="fr_FR" />
+  <meta property="og:site_name" content="ANR Search — MSHS Sud-Est" />
+  <meta property="og:title" content="Explorateur ANR — projets et partenaires depuis 2010" />
+  <meta property="og:description" content="Filtrez les projets ANR DGDS et DGPIE (depuis 2010) : organismes, régions, programmes, coordinateurs. Données ouvertes data.gouv.fr." />
+  <meta property="og:url" content="https://mshs-sud-est.gitpages.huma-num.fr/anr-search/" />
+  <meta property="og:image" content="https://mshs-sud-est.gitpages.huma-num.fr/anr-search/og.svg" />
+  <meta property="og:image:type" content="image/svg+xml" />
+  <meta property="og:image:alt" content="ANR Search — explorateur projets et partenaires" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Explorateur ANR — projets et partenaires depuis 2010" />
+  <meta name="twitter:description" content="Filtrez les projets ANR DGDS et DGPIE (depuis 2010) à partir des données ouvertes data.gouv.fr." />
+  <meta name="twitter:image" content="https://mshs-sud-est.gitpages.huma-num.fr/anr-search/og.svg" />
+
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="sitemap" type="application/xml" href="sitemap.xml" />
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
     href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap"
     rel="stylesheet" />
   <link rel="stylesheet" href="app.css" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebApplication",
+        "@id": "https://mshs-sud-est.gitpages.huma-num.fr/anr-search/#app",
+        "name": "ANR Search",
+        "alternateName": "Explorateur ANR projets et partenaires",
+        "url": "https://mshs-sud-est.gitpages.huma-num.fr/anr-search/",
+        "description": "Interface de recherche et de filtrage des projets et partenaires ANR depuis 2010 (DGDS et DGPIE), à partir des jeux ouverts data.gouv.fr.",
+        "inLanguage": "fr-FR",
+        "applicationCategory": "EducationalApplication",
+        "operatingSystem": "Any",
+        "browserRequirements": "Requires JavaScript",
+        "isAccessibleForFree": true,
+        "creator": {
+          "@type": "Person",
+          "name": "Xiaoou Wang",
+          "url": "https://xiaoouwang.github.io/",
+          "jobTitle": "Ingénieur en humanités numériques",
+          "affiliation": {
+            "@type": "Organization",
+            "name": "MSHS Sud-Est, Université Côte d’Azur",
+            "url": "https://mshs.univ-cotedazur.fr/services/humanites-numeriques"
+          }
+        },
+        "provider": {
+          "@type": "Organization",
+          "name": "MSHS Sud-Est",
+          "url": "https://mshs.univ-cotedazur.fr/"
+        },
+        "codeRepository": [
+          "https://gitlab.huma-num.fr/mshs-sud-est/anr-search",
+          "https://github.com/xiaoouwang/anr-search"
+        ],
+        "license": "https://opendatacommons.org/licenses/odbl/"
+      },
+      {
+        "@type": "Dataset",
+        "name": "ANR_01 Projets ANR DOS et DGDS",
+        "url": "https://www.data.gouv.fr/datasets/anr-01-projets-anr-dos-et-dgds-detail-des-projets-et-des-partenaires",
+        "creator": { "@type": "Organization", "name": "Agence nationale de la recherche" },
+        "license": "https://opendatacommons.org/licenses/odbl/"
+      },
+      {
+        "@type": "Dataset",
+        "name": "ANR_02 Projets ANR DGPIE",
+        "url": "https://www.data.gouv.fr/datasets/anr-02-projets-anr-dgpie-detail-des-projets-et-des-partenaires",
+        "creator": { "@type": "Organization", "name": "Agence nationale de la recherche" },
+        "license": "https://opendatacommons.org/licenses/odbl/"
+      },
+      {
+        "@type": "WebSite",
+        "name": "ANR Search",
+        "url": "https://mshs-sud-est.gitpages.huma-num.fr/anr-search/",
+        "inLanguage": "fr-FR",
+        "publisher": {
+          "@type": "Organization",
+          "name": "MSHS Sud-Est",
+          "url": "https://mshs.univ-cotedazur.fr/"
+        }
+      }
+    ]
+  }
+  </script>
 </head>
 
 <body>
@@ -18,9 +113,10 @@
     <header class="hero">
       <div class="hero-copy">
         <p class="kicker">ANR · depuis 2010 · DGDS &amp; DGPIE</p>
-        <h1>Projets &amp; partenaires<br /><em>toutes régions</em></h1>
+        <h1>Projets &amp; partenaires ANR<br /><em>toutes régions</em></h1>
         <p class="lede">
           Explorez <strong id="total-count">—</strong> lignes partenaires
+          des projets financés par l’Agence nationale de la recherche
           (DGDS et/ou DGPIE). Chaque filtre accepte plusieurs choix.
         </p>
         <div class="data-meta" id="data-meta" hidden></div>
