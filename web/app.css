@@ -673,10 +673,6 @@ dialog::backdrop {
     gap: 18px;
   }
 
-  .credits {
-    order: -1;
-  }
-
   .workspace {
     grid-template-columns: 1fr;
   }
