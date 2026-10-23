@@ -1,0 +1,56 @@
+# GitLab CI: refresh ANR data (schedule / manual) + deploy GitLab Pages
+# Docs: https://docs.gitlab.com/user/project/pages/
+
+stages:
+  - update
+  - deploy
+
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+
+cache:
+  key: pip-$CI_COMMIT_REF_SLUG
+  paths:
+    - .cache/pip
+
+# Weekly (or manual) refresh from data.gouv.fr — same role as GitHub Actions schedule
+update-data:
+  stage: update
+  image: python:3.12-bookworm
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+    - if: $CI_PIPELINE_SOURCE == "web"
+  script:
+    - pip install -r requirements.txt
+    - python update_data.py --format xlsx
+    - |
+      git config user.name "gitlab-ci"
+      git config user.email "gitlab-ci@${CI_SERVER_HOST}"
+      git add web/data.json web/meta.json web/first_seen.json
+      if git diff --staged --quiet; then
+        echo "No data changes to commit."
+      else
+        git commit -m "chore: refresh ANR data from data.gouv.fr"
+        # Prefer GIT_PUSH_TOKEN (Project Access Token, role Maintainer, scope write_repository).
+        # Fallback: CI_JOB_TOKEN if "CI job token" may push to this project (Settings → CI/CD → Job token).
+        AUTH_TOKEN="${GIT_PUSH_TOKEN:-$CI_JOB_TOKEN}"
+        AUTH_USER="oauth2"
+        if [ -z "${GIT_PUSH_TOKEN:-}" ]; then
+          AUTH_USER="gitlab-ci-token"
+        fi
+        git push "https://${AUTH_USER}:${AUTH_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git" "HEAD:${CI_DEFAULT_BRANCH}"
+      fi
+
+# Static site from web/ → GitLab Pages (compatible with older GitLab: copy into public/)
+pages:
+  stage: deploy
+  image: alpine:3.20
+  script:
+    - mkdir -p public
+    - cp -a web/. public/
+    - echo "Pages files ready under public/"
+  artifacts:
+    paths:
+      - public
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH

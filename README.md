@@ -4,8 +4,10 @@ Explorateur web des **projets et partenaires ANR** (depuis 2010), toutes région
 
 | | |
 |---|---|
-| **Site en ligne** | [https://xiaoouwang.github.io/anr-search/](https://xiaoouwang.github.io/anr-search/) |
-| **Dépôt** | [https://github.com/xiaoouwang/anr-search](https://github.com/xiaoouwang/anr-search) |
+| **Site (GitHub Pages)** | [https://xiaoouwang.github.io/anr-search/](https://xiaoouwang.github.io/anr-search/) |
+| **Dépôt GitHub** | [https://github.com/xiaoouwang/anr-search](https://github.com/xiaoouwang/anr-search) |
+| **Dépôt GitLab (Huma-Num)** | [https://gitlab.huma-num.fr/xwang1/anr-search](https://gitlab.huma-num.fr/xwang1/anr-search) |
+| **Site (GitLab Pages)** | [https://xwang1.gitlab.huma-num.fr/anr-search/](https://xwang1.gitlab.huma-num.fr/anr-search/) *(après premier pipeline Pages)* |
 | **Auteur** | [Xiaoou Wang](https://xiaoouwang.github.io/) — [ingénieur en humanités numériques](https://mshs.univ-cotedazur.fr/services/humanites-numeriques), MSHS Sud-Est, Université Côte d’Azur |
 
 ---
@@ -51,22 +53,49 @@ Licence des données : [ODbL](https://opendatacommons.org/licenses/odbl/) (voir 
 
 ---
 
-## Mise à jour automatique (GitHub Actions)
+## Mise à jour automatique
 
-Le workflow [`.github/workflows/update-and-deploy.yml`](.github/workflows/update-and-deploy.yml) :
+Les deux forges (GitHub + GitLab Huma-Num) peuvent héberger et rafraîchir le site.
+
+### GitHub Actions
+
+Fichier : [`.github/workflows/update-and-deploy.yml`](.github/workflows/update-and-deploy.yml)
 
 | Déclencheur | Effet |
 |-------------|--------|
-| **Chaque lundi** 05:00 UTC | Télécharge les dernières ressources, régénère `data.json` / `meta.json`, commit si changement, déploie Pages |
+| **Chaque lundi** 05:00 UTC | Télécharge les dernières ressources, régénère les JSON, commit si changement, déploie Pages |
 | **Actions → Run workflow** | Idem, à la demande |
-| **Push sur `main`** | Redéploie Pages (sans re-télécharger les données sauf schedule / dispatch) |
+| **Push sur `main`** | Redéploie Pages |
+
+Site : [https://xiaoouwang.github.io/anr-search/](https://xiaoouwang.github.io/anr-search/)
+
+### GitLab CI (Huma-Num)
+
+Fichier : [`.gitlab-ci.yml`](.gitlab-ci.yml)
+
+| Job | Déclencheur | Effet |
+|-----|-------------|--------|
+| `update-data` | **Schedule** ou **Run pipeline** (web) | `update_data.py`, commit `web/data.json`, `meta.json`, `first_seen.json` |
+| `pages` | Push sur `main` | Copie `web/` → `public/` et publie **GitLab Pages** |
+
+#### Activer sur gitlab.huma-num.fr
+
+1. Pousser ce dépôt vers [gitlab.huma-num.fr/xwang1/anr-search](https://gitlab.huma-num.fr/xwang1/anr-search).
+2. **Settings → General → Visibility** : Pages / projet selon votre politique Huma-Num.
+3. **Settings → CI/CD → Schedules** : créer un schedule (ex. `0 5 * * 1`, branche `main`) pour le refresh hebdomadaire.
+4. Pour que `update-data` puisse **pousser** les JSON mis à jour :
+   - créer un **Project Access Token** (Maintainer, scope `write_repository`) ;
+   - l’enregistrer en variable CI/CD masquée `GIT_PUSH_TOKEN` ;
+   - *ou* autoriser le *CI job token* à écrire sur le dépôt (Settings → CI/CD → Job token permissions).
+5. Lancer une fois **CI/CD → Pipelines → Run pipeline** : le job `pages` déploie le site.
+
+URL Pages typique Huma-Num : `https://xwang1.gitlab.huma-num.fr/anr-search/` (confirmée dans **Deploy → Pages** après le premier succès).
 
 Fichiers produits côté site :
 
 - `web/data.json` — lignes partenaires compactes + facettes
-- `web/meta.json` — dates de mise à jour **par source** (DGDS / DGPIE) et liens data.gouv.fr
-
-Pages : [https://xiaoouwang.github.io/anr-search/](https://xiaoouwang.github.io/anr-search/) (source = GitHub Actions).
+- `web/meta.json` — dates de mise à jour **par source** (DGDS / DGPIE)
+- `web/first_seen.json` — registre des premières apparitions (badge « Nouveau »)
 
 ---
 
@@ -141,13 +170,23 @@ Au premier déploiement de cette fonctionnalité, tous les projets existants son
 
 ## Réutiliser / adapter
 
-1. Forker le dépôt (ou cloner).
+### Sur GitHub
+
+1. Forker / cloner le dépôt.
 2. Activer **GitHub Pages** : Settings → Pages → Source = **GitHub Actions**.
 3. Adapter éventuellement les slugs dans `update_data.py` (`SOURCES`).
-4. Lancer une fois *Actions → Update ANR data & deploy Pages → Run workflow*.
-5. Le site sera sur `https://<user>.github.io/<repo>/`.
+4. Lancer une fois le workflow *Update ANR data & deploy Pages*.
+5. Site : `https://<user>.github.io/<repo>/`.
 
-Pour un cron local à la place de GitHub Actions :
+### Sur GitLab (ex. Huma-Num)
+
+1. Créer le projet / cloner.
+2. Pousser le code (avec `.gitlab-ci.yml`).
+3. Configurer le **schedule** + variable `GIT_PUSH_TOKEN` (voir ci-dessus).
+4. Lancer un pipeline : le job `pages` publie le site.
+5. Site : `https://<namespace>.gitlab.huma-num.fr/<projet>/` (ou domaine indiqué dans Deploy → Pages).
+
+### Cron local (sans forge)
 
 ```cron
 0 6 * * 1 cd /chemin/vers/anr-search && python update_data.py --format xlsx >> update.log 2>&1
