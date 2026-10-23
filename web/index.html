@@ -1,47 +1,57 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>ANR — explorateur projets &amp; partenaires</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap"
+    rel="stylesheet" />
   <link rel="stylesheet" href="app.css" />
 </head>
+
 <body>
   <div class="shell">
     <header class="hero">
+      <div class="hero-copy">
+        <p class="kicker">ANR · depuis 2010 · DGDS &amp; DGPIE</p>
+        <h1>Projets &amp; partenaires<br /><em>toutes régions</em></h1>
+        <p class="lede">
+          Explorez <strong id="total-count">—</strong> lignes partenaires
+          (DGDS et/ou DGPIE). Chaque filtre accepte plusieurs choix.
+        </p>
+        <div class="data-meta" id="data-meta" hidden></div>
+        <div class="hero-stats" id="hero-stats" hidden>
+          <div><span id="stat-rows">0</span><label>résultats</label></div>
+          <div><span id="stat-projets">0</span><label>projets</label></div>
+          <div><span id="stat-aide">—</span><label>aide partenaires</label></div>
+        </div>
+        <div class="active-chips" id="active-chips" hidden></div>
+      </div>
       <aside class="credits" aria-label="Crédits">
         <p>
           Conception et développement :
-          <a class="credit-name" href="https://xiaoouwang.github.io/" target="_blank" rel="noopener noreferrer">Xiaoou Wang</a>
+          <a class="credit-name" href="https://xiaoouwang.github.io/" target="_blank" rel="noopener noreferrer">Xiaoou
+            Wang</a>
           —
-          <a class="credit-role" href="https://mshs.univ-cotedazur.fr/services/humanites-numeriques" target="_blank" rel="noopener noreferrer">ingénieur en humanités numériques</a>,
+          <a class="credit-role" href="https://mshs.univ-cotedazur.fr/services/humanites-numeriques" target="_blank"
+            rel="noopener noreferrer">ingénieur en humanités numériques</a>,
           MSHS Sud-Est, Université Côte d’Azur
         </p>
         <p>
           <a href="https://github.com/xiaoouwang/anr-search" target="_blank" rel="noopener noreferrer">Dépôt GitHub</a>
           · données
-          <a href="https://www.data.gouv.fr/datasets/anr-01-projets-anr-dos-et-dgds-detail-des-projets-et-des-partenaires" target="_blank" rel="noopener noreferrer">ANR DGDS</a>
+          <a href="https://www.data.gouv.fr/datasets/anr-01-projets-anr-dos-et-dgds-detail-des-projets-et-des-partenaires"
+            target="_blank" rel="noopener noreferrer">ANR DGDS</a>
           et
-          <a href="https://www.data.gouv.fr/datasets/anr-02-projets-anr-dgpie-detail-des-projets-et-des-partenaires" target="_blank" rel="noopener noreferrer">ANR DGPIE</a>
+          <a href="https://www.data.gouv.fr/datasets/anr-02-projets-anr-dgpie-detail-des-projets-et-des-partenaires"
+            target="_blank" rel="noopener noreferrer">ANR DGPIE</a>
           (data.gouv.fr)
         </p>
       </aside>
-      <p class="kicker">ANR · depuis 2010 · DGDS &amp; DGPIE</p>
-      <h1>Projets &amp; partenaires<br /><em>toutes régions</em></h1>
-      <p class="lede">
-        Explorez <strong id="total-count">—</strong> lignes partenaires
-        (DGDS et/ou DGPIE). Chaque filtre accepte plusieurs choix.
-      </p>
-      <div class="data-meta" id="data-meta" hidden></div>
-      <div class="hero-stats" id="hero-stats" hidden>
-        <div><span id="stat-rows">0</span><label>résultats</label></div>
-        <div><span id="stat-projets">0</span><label>projets</label></div>
-        <div><span id="stat-aide">—</span><label>aide partenaires</label></div>
-      </div>
-      <div class="active-chips" id="active-chips" hidden></div>
     </header>
 
     <div class="workspace">
@@ -77,6 +87,20 @@
           <input id="q" type="search" placeholder="Acronyme, titre, organisme, responsable…" autocomplete="off" />
         </div>
 
+        <div class="filter-block" data-facet="villes">
+          <div class="facet-head">
+            <label>Villes</label>
+            <button type="button" class="linkish clear-facet" data-clear="villes">Effacer</button>
+          </div>
+          <input type="search" class="facet-search" data-search="villes" placeholder="Filtrer les villes…" />
+          <div class="facet-bulk" id="villes-bulk" hidden>
+            <button type="button" id="villes-select-all" class="btn ghost mini">
+              Tout sélectionner (<span id="villes-match-count">0</span>)
+            </button>
+          </div>
+          <div class="check-list tall" id="facet-villes"></div>
+        </div>
+
         <div class="filter-block" data-facet="annees">
           <div class="facet-head">
             <label>Années</label>
@@ -110,20 +134,6 @@
           <div class="check-list tall" id="facet-programmes"></div>
         </div>
 
-        <div class="filter-block" data-facet="villes">
-          <div class="facet-head">
-            <label>Villes</label>
-            <button type="button" class="linkish clear-facet" data-clear="villes">Effacer</button>
-          </div>
-          <input type="search" class="facet-search" data-search="villes" placeholder="Filtrer les villes…" />
-          <div class="facet-bulk" id="villes-bulk" hidden>
-            <button type="button" id="villes-select-all" class="btn ghost mini">
-              Tout sélectionner (<span id="villes-match-count">0</span>)
-            </button>
-          </div>
-          <div class="check-list tall" id="facet-villes"></div>
-        </div>
-
         <div class="filter-block">
           <label for="sort">Trier par</label>
           <select id="sort">
@@ -154,12 +164,7 @@
           <p class="hint">
             Organismes présents dans le résultat actuel — cliquez pour filtrer davantage (plusieurs possibles).
           </p>
-          <input
-            type="search"
-            id="org-post-search"
-            placeholder="Rechercher parmi ces organismes…"
-            autocomplete="off"
-          />
+          <input type="search" id="org-post-search" placeholder="Rechercher parmi ces organismes…" autocomplete="off" />
           <div class="chip-row selectable" id="org-post-chips"></div>
         </section>
         <div id="status" class="status">Chargement des données (fichier volumineux, ~37&nbsp;Mo)…</div>
@@ -185,4 +190,5 @@
 
   <script src="app.js"></script>
 </body>
+
 </html>
