@@ -7,7 +7,7 @@ Explorateur web des **projets et partenaires ANR** (depuis 2010), toutes région
 | **Site (GitHub Pages)** | [https://xiaoouwang.github.io/anr-search/](https://xiaoouwang.github.io/anr-search/) |
 | **Dépôt GitHub** | [https://github.com/xiaoouwang/anr-search](https://github.com/xiaoouwang/anr-search) |
 | **Dépôt GitLab (Huma-Num)** | [https://gitlab.huma-num.fr/mshs-sud-est/anr-search](https://gitlab.huma-num.fr/mshs-sud-est/anr-search) |
-| **Site (GitLab Pages)** | [https://mshs-sud-est.gitlab.huma-num.fr/anr-search/](https://mshs-sud-est.gitlab.huma-num.fr/anr-search/) *(confirmée dans Deploy → Pages)* |
+| **Site (GitLab Pages)** | [https://mshs-sud-est.gitpages.huma-num.fr/anr-search](https://mshs-sud-est.gitpages.huma-num.fr/anr-search) |
 | **Auteur** | [Xiaoou Wang](https://xiaoouwang.github.io/) — [ingénieur en humanités numériques](https://mshs.univ-cotedazur.fr/services/humanites-numeriques), MSHS Sud-Est, Université Côte d’Azur |
 
 ---
@@ -89,7 +89,7 @@ Fichier : [`.gitlab-ci.yml`](.gitlab-ci.yml)
    - un token créé sur un ancien chemin (`xwang1/…`) ne fonctionne pas après transfert.
 5. Lancer une fois **CI/CD → Pipelines → Run pipeline** : le job `pages` déploie le site.
 
-URL Pages typique : `https://mshs-sud-est.gitlab.huma-num.fr/anr-search/` (voir **Deploy → Pages**).
+URL Pages Huma-Num : [https://mshs-sud-est.gitpages.huma-num.fr/anr-search](https://mshs-sud-est.gitpages.huma-num.fr/anr-search).
 
 Fichiers produits côté site :
 
@@ -184,7 +184,7 @@ Au premier déploiement de cette fonctionnalité, tous les projets existants son
 2. Pousser le code (avec `.gitlab-ci.yml`).
 3. Configurer le **schedule** + variable `GIT_PUSH_TOKEN` (voir ci-dessus).
 4. Lancer un pipeline : le job `pages` publie le site.
-5. Site : `https://<namespace>.gitlab.huma-num.fr/<projet>/` (ou domaine indiqué dans Deploy → Pages).
+5. Site Huma-Num : `https://<namespace>.gitpages.huma-num.fr/<projet>` (ex. [anr-search](https://mshs-sud-est.gitpages.huma-num.fr/anr-search)).
 
 ### Cron local (sans forge)
 
